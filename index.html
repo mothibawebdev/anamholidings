@@ -7,116 +7,195 @@
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #fafafa;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      /*margin-bottom: 10px;*/
-    }
-    header img {
-      height: 150px;
-    }
-    h1 {
-      color: #601c14;
-      margin: 0;
-    }
-    .container {
-      display: flex;
-      gap: 20px;
-      width: 100%;
-      max-width: 1500px;
-    }
-    .form-section, .invoice-section {
-      background: white;
-      border-radius: 10px;
-      padding: 20px 30px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      flex: 1;
-    }
-    .form-group {
-      margin-bottom: 10px;
-    }
-    .form-row {
-      display: flex;
-      gap: 30px;
-    }
-    .form-row .form-group.half {
-      flex: 1;
-    }
+  font-family: Arial, sans-serif;
+  background-color: #fafafa;
+  margin: 0;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-    label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 8px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-    textarea{
-      resize: none;
-    }
-    .note-box {
-      background: #fff4cc;
-      border-left: 6px solid #f1b800;
-      padding: 10px;
-      margin-bottom: 15px;
-      font-size: 0.9em;
-    }
-    .invoice {
-      white-space: pre-wrap;
-      background: #f9f9f9;
-      padding: 15px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-family: monospace;
-    }
-    button {
-      background-color: #601c14;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    button:hover {
-      background-color: #8b2e22;
-    }
-    
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  text-align: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+header img {
+  height: 150px;
+  max-width: 100%;
+  transition: all 0.3s ease;
+}
+
+header h1 {
+  color: #601c14;
+  margin: 0;
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+/* Mobile view: stack logo and title */
+@media (max-width: 900px) {
+  header {
+    flex-direction: column;
+  }
+
+  header img {
+    height: 100px;
+  }
+
+  header h1 {
+    font-size: 1.3em;
+    margin-top: 5px;
+  }
+}
+
+
+h1 {
+  color: #601c14;
+  margin: 0;
+}
+
+.container {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  max-width: 1500px;
+}
+
+.form-section,
+.invoice-section {
+  background: white;
+  border-radius: 10px;
+  padding: 20px 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex: 1;
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+.form-row {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.form-row .form-group.half {
+  flex: 1 1 45%;
+  min-width: 200px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+textarea {
+  resize: none;
+}
+
+.note-box {
+  background: #fff4cc;
+  border-left: 6px solid #f1b800;
+  padding: 10px;
+  margin-bottom: 15px;
+  font-size: 0.9em;
+}
+
+.invoice {
+  white-space: pre-wrap;
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-family: monospace;
+  overflow-x: auto;
+}
+
+button {
+  background-color: #601c14;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+  width: 100%;
+  max-width: 250px;
+}
+
+button:hover {
+  background-color: #8b2e22;
+}
+
 .select2-container--default .select2-selection--multiple {
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 4px;
-    }
-    
-    @media (max-width: 900px) {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 4px;
+  min-height: 42px;
+  font-size: 16px;
+}
+
+/* Responsive layout: stack form and invoice vertically on small screens */
+@media (max-width: 900px) {
   .container {
     flex-direction: column;
   }
-  .form-section, .invoice-section {
+
+  .form-section,
+  .invoice-section {
     width: 100%;
+    padding: 15px 20px;
+  }
+
+  .invoice-section {
+    margin-top: 20px;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 15px;
+  }
+
+  button {
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  .note-box {
+    font-size: 0.85em;
   }
 }
+
   </style>
 </head>
 <body>
 
   <header>
-    <img src="logo.png" alt="Anam Cleaning Services Logo">
-    <!-- <h1>Anam Cleaning Services</h1> -->
-  </header>
+  <img src="logo.png" alt="Anam Cleaning Services Logo">
+  <h1>Anam Cleaning Services</h1>
+</header>
 
   <div class="container">
     <!-- Form Section -->
@@ -395,14 +474,17 @@ doc.text("Email: lungelwasgelem@gmail.com | Phone: +27 71 150 5808", pageWidth /
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
    <script>
     $(document).ready(function() {
-      $('#extras').select2({
-        placeholder: "Select extras",
-        allowClear: true,
-        tags: true
-      });
-    });
+  $('#extras').select2({
+    placeholder: "Select extras",
+    allowClear: true,
+    width: '100%',
+    dropdownAutoWidth: true
+  }).on('change', function() {
+    updateInvoice();
+  });
+});
+
   </script>
 
 </body>
 </html>
-
