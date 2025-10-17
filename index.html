@@ -100,7 +100,14 @@
       border-radius: 8px;
       padding: 4px;
     }
-
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+  }
+  .form-section, .invoice-section {
+    width: 100%;
+  }
+}
   </style>
 </head>
 <body>
@@ -389,4 +396,5 @@ Time: ${time}
 
 </body>
 </html>
+
 
