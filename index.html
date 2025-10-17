@@ -1,378 +1,391 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AH Cleaning Services</title>
+  <meta charset="UTF-8">
+  <title>Anam Cleaning Services | Booking & Invoice</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
   <style>
-    :root {
-      --bg: #0f172a;         
-      --card: #111827;        /* gray-900 */
-      --muted: #cbd5e1;       /* slate-300 */
-      --text: #e5e7eb;        /* gray-200 */
-      --primary: #22c55e;     /* green-500 */
-      --accent: #60a5fa;      /* blue-400 */
-      --border: #1f2937;      /* gray-800 */
-      --chip: #0b1220;        /* deep bg */
-    }
-    *, *::before, *::after { box-sizing: border-box; }
-    html, body { height: 100%; }
     body {
-      margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell,
-      Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      color: var(--text); background: radial-gradient(1000px 600px at 10% -20%, #1e293b66, transparent), var(--bg);
-      line-height: 1.5; -webkit-font-smoothing: antialiased;
+      font-family: Arial, sans-serif;
+      background-color: #fafafa;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1rem 4rem; }
-
     header {
-      position: sticky; top: 0; z-index: 10; backdrop-filter: blur(8px);
-      background: linear-gradient(180deg, #0f172abf, #0f172a99, transparent);
-      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      /*margin-bottom: 10px;*/
     }
-    .header-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 1rem; padding: 0.8rem 1rem; }
-    .logo-img { height: 60px; }
-    h1 { font-size: clamp(1.1rem, 2.6vw, 1.6rem); margin: 0; letter-spacing: 0.3px; }
-    .chip { margin-left: auto; font-size: 0.875rem; color: var(--muted); background: var(--chip); border: 1px solid var(--border); padding: 0.35rem 0.6rem; border-radius: 999px; }
+    header img {
+      height: 150px;
+    }
+    h1 {
+      color: #601c14;
+      margin: 0;
+    }
+    .container {
+      display: flex;
+      gap: 20px;
+      width: 100%;
+      max-width: 1500px;
+    }
+    .form-section, .invoice-section {
+      background: white;
+      border-radius: 10px;
+      padding: 20px 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      flex: 1;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    .form-row {
+      display: flex;
+      gap: 30px;
+    }
+    .form-row .form-group.half {
+      flex: 1;
+    }
 
-    .card { background: linear-gradient(180deg, #0b1020, #0b0f1c); border: 1px solid var(--border); border-radius: 18px; padding: 1rem; box-shadow: 0 10px 30px #0008; margin-top: 1.25rem; }
-    .card h2 { margin: 0 0 0.75rem; font-size: clamp(1rem, 2.2vw, 1.25rem); color: #e6f6ff; }
-    .note { color: var(--muted); font-size: 0.9rem; margin-top: 0.25rem; }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    textarea{
+      resize: none;
+    }
+    .note-box {
+      background: #fff4cc;
+      border-left: 6px solid #f1b800;
+      padding: 10px;
+      margin-bottom: 15px;
+      font-size: 0.9em;
+    }
+    .invoice {
+      white-space: pre-wrap;
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-family: monospace;
+    }
+    button {
+      background-color: #601c14;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #8b2e22;
+    }
+    
+.select2-container--default .select2-selection--multiple {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 4px;
+    }
 
-    table { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 14px; border: 1px solid var(--border); }
-    thead { background: linear-gradient(180deg, #0b1220, #0a1326); }
-    th, td { padding: 0.75rem 0.8rem; text-align: center; border-bottom: 1px solid var(--border); }
-    th { font-weight: 700; color: #c7e1ff; font-size: 0.92rem; }
-    td { font-variant-numeric: tabular-nums; }
-    tbody tr:nth-child(even) { background: #0a122244; }
-
-    .rowhead { text-align: left; color: #bfe5c9; font-weight: 700; }
-    .badge { display: inline-block; padding: 0.18rem 0.5rem; border-radius: 999px; background: #052e1b; color: #75f0aa; border: 1px solid #0c3a22; font-size: 0.8rem; }
-    .poa { color: #f59e0b; font-weight: 600; }
-    .dash { color: #94a3b8; }
-
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } th, td { padding: 0.6rem; } }
-
-    footer { margin-top: 2rem; color: var(--muted); font-size: 0.9rem; }
-    .small { font-size: 0.85rem; color: #9fb5c9; }
   </style>
 </head>
 <body>
+
   <header>
-    <div class="header-inner">
-      <img src="img/logo.png" alt="Anam Holdings Logo" class="logo-img" />
-      <h1>Cleaning Services</h1>
-      <div class="chip">Cell: 071&nbsp;158&nbsp;5808</div>
-    </div>
+    <img src="logo.png" alt="Anam Cleaning Services Logo">
+    <!-- <h1>Anam Cleaning Services</h1> -->
   </header>
 
   <div class="container">
-
-    <div class="card">
-      <h2>Bedrooms — <span class="badge">Deep Cleaning</span></h2>
-      <table role="table" aria-label="Bedrooms Deep Cleaning">
-        <thead>
-          <tr>
-            <th>Frequency</th>
-            <th>1</th>
-            <th>2</th>
-            <th>3</th>
-            <th>4</th>
-            <th>5</th>
-            <th>6+</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="rowhead">Once off</td>
-            <td>R 700</td>
-            <td>R 800</td>
-            <td>R 920</td>
-            <td>R 1&nbsp;000</td>
-            <td>R 1&nbsp;320</td>
-            <td class="poa">POA</td>
-          </tr>
-          <tr>
-            <td class="rowhead">Monthly</td>
-            <td>R 570</td>
-            <td>R 704</td>
-            <td>R 760</td>
-            <td>R 860</td>
-            <td>R 1&nbsp;008</td>
-            <td class="poa">POA</td>
-          </tr>
-          <tr>
-            <td class="rowhead">Bi-weekly</td>
-            <td>R 530</td>
-            <td>R 640</td>
-            <td>R 660</td>
-            <td>R 760</td>
-            <td>R 952</td>
-            <td class="poa">POA</td>
-          </tr>
-          <tr>
-            <td class="rowhead">Weekly</td>
-            <td>R 500</td>
-            <td>R 580</td>
-            <td>R 620</td>
-            <td>R 680</td>
-            <td>R 890</td>
-            <td class="poa">POA</td>
-          </tr>
-        </tbody>
-      </table>
-      <p class="note small">POA = Price on Application. Values reflect the provided price list; cells shown as POA indicate 6+ bedrooms require a custom quote.</p>
-    </div>
-
-    <div class="card">
-      <h2>Bedrooms — <span class="badge">Standard Cleaning</span></h2>
-      <table role="table" aria-label="Bedrooms Standard Cleaning">
-        <thead>
-          <tr>
-            <th>Frequency</th>
-            <th>1</th>
-            <th>2</th>
-            <th>3</th>
-            <th>4</th>
-            <th>5</th>
-            <th>6+</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="rowhead">Once off</td>
-            <td>R 300</td>
-            <td>R 450</td>
-            <td>R 600</td>
-            <td>R 700</td>
-            <td>R 900</td>
-            <td class="poa">POA</td>
-          </tr>
-          <tr>
-            <td class="rowhead">Monthly</td>
-            <td>R 400</td>
-            <td>R 550</td>
-            <td>R 650</td>
-            <td>R 850</td>
-            <td class="dash">—</td>
-            <td class="poa">POA</td>
-          </tr>
-          <tr>
-            <td class="rowhead">Bi-weekly</td>
-            <td>R 350</td>
-            <td>R 450</td>
-            <td>R 750</td>
-            <td class="dash">—</td>
-            <td class="dash">—</td>
-            <td class="poa">POA</td>
-          </tr>
-          <tr>
-            <td class="rowhead">Weekly</td>
-            <td>R 350</td>
-            <td>R 450</td>
-            <td>R 750</td>
-            <td class="dash">—</td>
-            <td class="dash">—</td>
-            <td class="poa">POA</td>
-          </tr>
-        </tbody>
-      </table>
-      <p class="note small">Dashes indicate values that were not legible on the provided document; please confirm if you need exact figures filled in.</p>
-    </div>
-
-    <div class="grid">
-      <div class="card">
-        <h2>Moveouts — <span class="badge">Deep Cleaning</span></h2>
-        <table role="table" aria-label="Moveouts Deep Cleaning">
-          <thead>
-            <tr>
-              <th>Bedrooms</th>
-              <th>1</th>
-              <th>2</th>
-              <th>3</th>
-              <th>4</th>
-              <th>5</th>
-              <th>6+</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="rowhead">Price</td>
-              <td>R 550</td>
-              <td>R 650</td>
-              <td>R 800</td>
-              <td>R 1&nbsp;000</td>
-              <td>R 1&nbsp;100</td>
-              <td class="poa">POA</td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- Form Section -->
+    <div class="form-section">
+      <div class="note-box">
+        <strong>Please note:</strong> This is a preliminary invoice. The final invoice will be confirmed onsite.<br><br>
+        <strong>Note:</strong> Our cleaning services are available exclusively on weekends.
       </div>
 
-      <div class="card">
-        <h2>Bathrooms / Shower Cleaning</h2>
-        <table role="table" aria-label="Bathrooms">
-          <thead>
-            <tr>
-              <th>Count</th>
-              <th>1</th>
-              <th>2</th>
-              <th>3</th>
-              <th>4</th>
-              <th>5</th>
-              <th>6+</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="rowhead">Price</td>
-              <td>R 200</td>
-              <td>R 275</td>
-              <td>R 300</td>
-              <td class="poa">POA</td>
-              <td class="poa">POA</td>
-              <td class="poa">POA</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
 
-    <div class="grid">
-      <div class="card">
-        <h2>Window Cleaning — <span class="badge">By Number of Windows</span></h2>
-        <table role="table" aria-label="Windows">
-          <thead>
-            <tr>
-              <th>Windows</th>
-              <th>1–4</th>
-              <th>5–8</th>
-              <th>9–12</th>
-              <th>13–15</th>
-              <th>16+</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="rowhead">Internal</td>
-              <td>R 100</td>
-              <td>R 150</td>
-              <td>R 300</td>
-              <td>R 350</td>
-              <td class="poa">POA</td>
-            </tr>
-            <tr>
-              <td class="rowhead">External</td>
-              <td>R 100</td>
-              <td>R 150</td>
-              <td>R 300</td>
-              <td>R 350</td>
-              <td class="poa">POA</td>
-            </tr>
-            <tr>
-              <td class="rowhead">Internal &amp; External</td>
-              <td>R 240</td>
-              <td>R 300</td>
-              <td>R 500</td>
-              <td>R 700</td>
-              <td class="poa">POA</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="card">
-        <h2>Sliding Doors</h2>
-        <table role="table" aria-label="Sliding Doors">
-          <thead>
-            <tr>
-              <th>Doors</th>
-              <th>1–2</th>
-              <th>3–4</th>
-              <th>5–6</th>
-              <th>7–10</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="rowhead">Price</td>
-              <td>R 100</td>
-              <td>R 180</td>
-              <td>R 300</td>
-              <td>R 450</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="grid">
-      <div class="card">
-        <h2>Window Blinds <span class="small">(R35 per window)</span></h2>
-        <table role="table" aria-label="Blinds">
-          <thead>
-            <tr>
-              <th>Windows</th>
-              <th>1–3</th>
-              <th>4–6</th>
-              <th>7–10</th>
-              <th>11+</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="rowhead">Price</td>
-              <td>R 105</td>
-              <td>R 210</td>
-              <td>R 350</td>
-              <td class="poa">POA</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="card">
-        <h2>Oven / Microwave — <span class="badge">Deep Cleaning</span></h2>
-        <table role="table" aria-label="Appliances">
-          <thead>
-            <tr>
-              <th>Appliances</th>
-              <th>1–2</th>
-              <th>3–4</th>
-              <th>5–6</th>
-              <th>7–10</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="rowhead">Ovens</td>
-              <td>R 110</td>
-              <td>R 180</td>
-              <td>R 300</td>
-              <td>R 430</td>
-            </tr>
-            <tr>
-              <td class="rowhead">Microwaves</td>
-              <td>R 70</td>
-              <td>R 160</td>
-              <td>R 270</td>
-              <td>R 350</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <footer>
-      <p class="small">Notes:</p>
-      <ul class="small">
-        <li>Study rooms, offices, and extra living rooms are treated as bedrooms.</li>
-        <li>Prices are indicative and may be adjusted at the time of cleaning; any changes will be communicated before work begins.</li>
-      </ul>
-    </footer>
+      <div class="form-row">
+  <div class="form-group half">
+    <label>First Name</label>
+    <input type="text" id="fname" required onchange="updateInvoice()">
   </div>
+  <div class="form-group half">
+    <label>Last Name</label>
+    <input type="text" id="lname" required onchange="updateInvoice()">
+  </div>
+</div>
+    <div class="form-row">
+      <div class="form-group half">
+        <label>Contact Number</label>
+        <input type="text" id="contact" required onchange="updateInvoice()">
+      </div>
+      <div class="form-group half">
+        <label>Email</label>
+        <input type="email" id="email" onchange="updateInvoice()">
+      </div>
+    </div>
+      
+      <div class="form-group">
+        <label>Residential Address *</label>
+        <input type="text" id="address" required name="Residential Address" onchange="updateInvoice()">
+      </div>
+
+      <div class="form-group">
+        <label>Service Required</label>
+        <select id="service" required onchange="updateInvoice()">
+          <option value="">Select</option>
+          <option value="Standard Cleaning">Standard Cleaning</option>
+          <option value="Deep Cleaning">Deep/Spring Cleaning</option>
+          <option value="Move In/Out Cleaning">Move In/Out Cleaning</option>
+          <option value="Moult Cleaning">Moult Cleaning</option>
+          <option value="Event Cleaning">Event Cleaning</option>
+        </select>
+      </div>
+
+      <div class="form-row">        
+        <div class="form-group half">
+          <label>Bedrooms</label>
+          <input type="number" id="bedrooms" min="0" value="0" required onchange="updateInvoice()">
+        </div>
+        <div class="form-group half">
+          <label>Bathrooms</label>
+          <input type="number" id="bathrooms" min="0" value="0" onchange="updateInvoice()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Bathroom Type</label>
+        <select id="bathroomType" required onchange="updateInvoice()">
+          <option value="">Select</option>
+          <option value="Bathtub">Bathtub</option>
+          <option value="Shower">Shower</option>
+          <option value="Both">Both</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="addional_service">Optional Services (Inclusive with Deep Cleaning)</label>
+        <select id="extras" multiple="multiple" style="width:100%;" onchange="updateInvoice()">
+        <option value="Oven">Oven</option>
+        <option value="Ironing">Ironing</option>
+        <option value="Carpet">Carpet</option>
+        <option value="Windows">Windows</option>
+        <option value="Laundry">Laundry</option>
+        <option value="Fridge">Fridge</option>
+        <option value="Cabinet">Cabinet</option>
+        <option value="Moult_Removal">Moult Removal</option>
+      </select>
+      </div>
+          
+      <div class="form-row">
+        <div class="form-group half">
+          <label>Date</label>
+          <input type="date" id="date" required onchange="updateInvoice()">
+        </div>
+        <div class="form-group half">
+          <label>Time</label>
+          <input type="time" id="time" required onchange="updateInvoice()">
+        </div>
+          
+        </div>
+    </div>
+
+    <!-- Invoice Section -->
+    
+    <div class="invoice-section">      
+      <h2>Estimate: Invoice Preview</h2>
+      <div id="invoiceOutput" class="invoice"></div>
+      <br/>
+      <div class="note-box">
+        Download the estimate and send it to us by WhatsApp or email. We will call you there after to discuss it and might need some more information from you.
+      </div>
+      <button onclick="downloadPDF()">Download Invoice</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    function updateInvoice() {
+      const fname = document.getElementById('fname').value || '';
+      const lname = document.getElementById('lname').value || '';
+      const contact = document.getElementById('contact').value || '';
+      const email = document.getElementById('email').value || '';
+      const address = document.getElementById('address').value || '';
+      const service = document.getElementById('service').value || '';
+      const bedrooms = parseInt(document.getElementById('bedrooms').value) || 0;
+      const bathrooms = parseInt(document.getElementById('bathrooms').value) || 0;
+      const bathroomType = document.getElementById('bathroomType').value;
+      // const extras = parseInt(document.getElementById('extras').value) || 0;
+      const date = document.getElementById('date').value;
+      const time = document.getElementById('time').value;
+
+      const extrasSelect = document.getElementById('extras');
+      const selectedExtras = Array.from(extrasSelect.selectedOptions).map(opt => opt.value);
+
+      const prices = {
+        standardCleaning: 450,
+        deepCleaning: 1200,
+        perBedroom: 100,
+        bathroomStandard: 80,
+        bathroomDeep: 250,
+        extras: {
+          windows: 140,
+          ironing: 35,
+          laundry: 100,
+          carpet: 60,
+          fridge: 90,
+          oven: 30,
+          cabinet: 60,
+          moult_removal: 300
+        }
+      };
+
+      let subtotal = 0;
+
+  // --- Service cost --- else if (service === "Moult Cleaning") subtotal += prices.deepCleaning + 300;
+
+      if (service === "Standard Cleaning") subtotal += prices.standardCleaning;
+      else if (service === "Deep Cleaning") subtotal += prices.deepCleaning;
+      else if (service === "Move In/Out Cleaning") subtotal += prices.deepCleaning + 200; // small uplift
+      else if (service === "Event Cleaning") subtotal += 800; {}
+
+      subtotal += bedrooms * prices.perBedroom;
+
+      if (service === "Deep Cleaning")
+        subtotal += bathrooms * prices.bathroomDeep;
+      else
+        subtotal += bathrooms * prices.bathroomStandard;
+
+      let extrasText = [];
+        selectedExtras.forEach(extra => {
+          //const key = extra.trim().toLowerCase();
+          const key = extra.toLowerCase(); // normalize to lowercase
+          const price = prices.extras[key] || 0;
+          extrasText.push(`${extra} (R${price})`);
+          subtotal += price;
+      });
+
+      const vat = subtotal * 0.15;
+      const total = subtotal + vat;
+
+      const invoiceText = `
+Bill To:
+${fname} ${lname}
+Contact Number: ${contact}
+Email: ${email}
+Residential Address: ${address}
+
+--------------------------------------
+Service Type: ${service}
+Bedrooms: ${bedrooms} @ R${prices.perBedroom}
+Bathrooms: ${bathrooms} @ R${service === "Deep Cleaning" ? prices.bathroomDeep : prices.bathroomStandard}
+Extras: ${extrasText.length ? extrasText.join(", ") : "None"}
+--------------------------------------
+
+Subtotal: R${subtotal.toFixed(2)}
+VAT (15%): R${vat.toFixed(2)}
+
+Estimated Total (Incl. VAT): R${total.toFixed(2)}
+--------------------------------------
+Date: ${date}
+Time: ${time}
+`;
+
+      document.getElementById('invoiceOutput').textContent = invoiceText;
+    }
+    updateInvoice();
+
+    async function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({
+    unit: "mm",
+    format: "a4"
+  });
+
+  // Load and insert logo (must be in same directory)
+  const img = new Image();
+  img.src = "logo.png";
+
+  img.onload = function() {
+    // Add logo (x, y, width, height)
+    doc.addImage(img, "PNG", 10, 10, 50, 20);
+    //center the logo here
+
+    //center this below the logo
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("Professional Residential & Deep Cleaning Services", 55, 27);
+    doc.text("Email: lungelwasgelem@gmail.com | Phone: +27 71 150 5808", 55, 32);
+
+    // Add header text
+    // doc.setFont("helvetica", "bold");
+    // doc.setFontSize(16);
+    // doc.text("Cleaning Services", 55, 20);
+
+    
+
+    // Add line separator
+    doc.setDrawColor(96, 28, 20);
+    doc.line(10, 50, 200, 50);
+
+    // Invoice title
+    doc.setFontSize(14);
+    doc.text("Estimate Invoice Summary", 10, 60);
+
+    // Get invoice content
+    const text = document.getElementById("invoiceOutput").textContent;
+
+    // Wrap text and add after title
+    const lineHeight = 6;
+    const marginLeft = 10;
+    const marginTop = 70;
+    const lines = doc.splitTextToSize(text, 190);
+    doc.text(lines, marginLeft, marginTop, { maxWidth: 190, lineHeightFactor: 1.5 });
+
+    // Add footer
+    const pageHeight = doc.internal.pageSize.height;
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    doc.text(
+      "Thank you for choosing Anam Cleaning Services!",
+      10,
+      pageHeight - 10
+    );
+
+    // Save PDF
+    doc.save("AnamCleaningInvoice.pdf");
+  };
+}
+
+
+    
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+   <script>
+    $(document).ready(function() {
+      $('#extras').select2({
+        placeholder: "Select extras",
+        allowClear: true,
+        tags: true
+      });
+    });
+  </script>
+
 </body>
 </html>
-
-
