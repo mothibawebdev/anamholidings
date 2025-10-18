@@ -187,6 +187,12 @@ button:hover {
     font-size: 0.85em;
   }
 }
+input:disabled,
+select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
 
   </style>
 </head>
@@ -222,13 +228,13 @@ button:hover {
         <input type="text" id="contact" required onchange="updateInvoice()">
       </div>
       <div class="form-group half">
-        <label>Email</label>
+        <label>Email (Optional)</label>
         <input type="email" id="email" onchange="updateInvoice()">
       </div>
     </div>
       
       <div class="form-group">
-        <label>Residential Address *</label>
+        <label>Residential Address</label>
         <input type="text" id="address" required name="Residential Address" onchange="updateInvoice()">
       </div>
 
@@ -239,7 +245,6 @@ button:hover {
           <option value="Standard Cleaning">Standard Cleaning</option>
           <option value="Deep Cleaning">Deep/Spring Cleaning</option>
           <option value="Move In/Out Cleaning">Move In/Out Cleaning</option>
-          <option value="Moult Cleaning">Moult Cleaning</option>
           <option value="Event Cleaning">Event Cleaning</option>
         </select>
       </div>
@@ -265,7 +270,7 @@ button:hover {
         </select>
       </div>
       <div class="form-group">
-        <label for="addional_service">Optional Services (Inclusive with Deep Cleaning)</label>
+        <label for="addional_service">Optional Services (Inclusive with Deep & Move-in/out Cleaning)</label>
         <select id="extras" multiple="multiple" style="width:100%;" onchange="updateInvoice()">
         <option value="Oven">Oven</option>
         <option value="Ironing">Ironing</option>
@@ -275,6 +280,7 @@ button:hover {
         <option value="Fridge">Fridge</option>
         <option value="Cabinet">Cabinet</option>
         <option value="Moult_Removal">Moult Removal</option>
+        <option value="Dishes">Dishes</option>
       </select>
       </div>
           
@@ -313,20 +319,46 @@ button:hover {
       const email = document.getElementById('email').value || '';
       const address = document.getElementById('address').value || '';
       const service = document.getElementById('service').value || '';
-      const bedrooms = parseInt(document.getElementById('bedrooms').value) || 0;
-      const bathrooms = parseInt(document.getElementById('bathrooms').value) || 0;
-      const bathroomType = document.getElementById('bathroomType').value;
-      // const extras = parseInt(document.getElementById('extras').value) || 0;
+      const bedroomsInput = document.getElementById('bedrooms');
+      const bathroomsInput = document.getElementById('bathrooms');
+      const bathroomTypeSelect = document.getElementById('bathroomType');
       const date = document.getElementById('date').value;
       const time = document.getElementById('time').value;
-
       const extrasSelect = document.getElementById('extras');
+
       const selectedExtras = Array.from(extrasSelect.selectedOptions).map(opt => opt.value);
+      const bathrooms = parseInt(bathroomsInput.value) || 0;
+      const bedrooms = parseInt(bedroomsInput.value) || 0;
+
+      // --- Disable rules based on selected service ---
+
+      if(service === "Event Cleaning"){
+          bathroomTypeSelect.disabled = true;
+          extrasSelect.disabled = true;
+          bathroomsInput.disabled = true;
+          bedroomsInput.disabled = true;
+          bathroomsInput.value = 0;
+          bedroomsInput.value=0; 
+      }
+      else if(service === "Deep Cleaning" ||  service === "Move In/Out Cleaning") {
+        extrasSelect.disabled = true;
+
+        bathroomTypeSelect.disabled = false;
+        bathroomsInput.disabled = false;
+        bedroomsInput.disabled = false;
+      }
+      else{
+          bathroomTypeSelect.disabled = false;
+          extrasSelect.disabled = false;
+          bathroomsInput.disabled = false;
+          bedroomsInput.disabled = false;
+      }
 
       const prices = {
         standardCleaning: 450,
         deepCleaning: 1200,
         perBedroom: 100,
+        perBedroomDeep: 180,
         bathroomStandard: 80,
         bathroomDeep: 250,
         extras: {
@@ -336,30 +368,31 @@ button:hover {
           carpet: 60,
           fridge: 90,
           oven: 30,
-          cabinet: 60,
-          moult_removal: 300
+          cabinet: 200,
+          moult_removal: 300,
+          dishes: 100
         }
       };
 
       let subtotal = 0;
 
-  // --- Service cost --- else if (service === "Moult Cleaning") subtotal += prices.deepCleaning + 300;
-
       if (service === "Standard Cleaning") subtotal += prices.standardCleaning;
       else if (service === "Deep Cleaning") subtotal += prices.deepCleaning;
       else if (service === "Move In/Out Cleaning") subtotal += prices.deepCleaning + 200; // small uplift
-      else if (service === "Event Cleaning") subtotal += 800; {}
+      else if (service === "Event Cleaning") subtotal += 1500;
 
-      subtotal += bedrooms * prices.perBedroom;
+      // subtotal += bedrooms * prices.perBedroom;
+      subtotal += bedrooms * (service === "Deep Cleaning" ? prices.perBedroomDeep : prices.perBedroom);
 
-      if (service === "Deep Cleaning")
-        subtotal += bathrooms * prices.bathroomDeep;
-      else
-        subtotal += bathrooms * prices.bathroomStandard;
+      // if (service === "Deep Cleaning")
+      //   subtotal += bathrooms * prices.bathroomDeep;
+      // else
+      //   subtotal += bathrooms * prices.bathroomStandard;
+      subtotal += bathrooms * (service === "Deep Cleaning" ? prices.bathroomDeep : prices.bathroomStandard);
+
 
       let extrasText = [];
         selectedExtras.forEach(extra => {
-          //const key = extra.trim().toLowerCase();
           const key = extra.toLowerCase(); // normalize to lowercase
           const price = prices.extras[key] || 0;
           extrasText.push(`${extra} (R${price})`);
@@ -371,16 +404,25 @@ button:hover {
 
       const invoiceText = `
 Bill To:
+--------------------------------------
 ${fname} ${lname}
 Contact Number: ${contact}
 Email: ${email}
 Residential Address: ${address}
 
 --------------------------------------
-Service Type: ${service}
-Bedrooms: ${bedrooms} @ R${prices.perBedroom}
-Bathrooms: ${bathrooms} @ R${service === "Deep Cleaning" ? prices.bathroomDeep : prices.bathroomStandard}
-Extras: ${extrasText.length ? extrasText.join(", ") : "None"}
+Service Type: ${service || "Not Selected"}
+Bedrooms: ${service === "Event Cleaning" 
+  ? "Not applicable" 
+  : `${bedrooms} @ R${service === "Deep Cleaning" ? prices.perBedroomDeep : prices.perBedroom}` }
+Bathrooms: ${service === "Event Cleaning" 
+  ? "Not applicable" 
+  : `${bathrooms} @ R${service === "Deep Cleaning" ? prices.bathroomDeep : prices.bathroomStandard}` }
+Extras: ${service === "Event Cleaning" 
+  ? "Not applicable" 
+  : extrasText.length 
+    ? extrasText.join(", ") 
+    : "None"}
 --------------------------------------
 
 Subtotal: R${subtotal.toFixed(2)}
@@ -409,37 +451,36 @@ Time: ${time}
 
   img.onload = function() {
     const pageWidth = doc.internal.pageSize.getWidth();
+    const currentDate = new Date().toLocaleDateString();
 
 // Centered logo
-const logoWidth = 50;
-const logoHeight = 20;
-const logoX = (pageWidth - logoWidth) / 2; // center horizontally
-doc.addImage(img, "PNG", logoX, 10, logoWidth, logoHeight);
-
-// Text below logo (centered)
-doc.setFont("helvetica", "bold");
-doc.setFontSize(14);
-doc.text("Anam Cleaning Services", pageWidth / 2, 38, { align: "center" });
-
-doc.setFont("helvetica", "normal");
-doc.setFontSize(10);
-doc.text("Professional Residential & Deep Cleaning Services", pageWidth / 2, 44, { align: "center" });
-doc.text("Email: lungelwasgelem@gmail.com | Phone: +27 71 150 5808", pageWidth / 2, 49, { align: "center" });
-
-    // Add header text
-    // doc.setFont("helvetica", "bold");
-    // doc.setFontSize(16);
-    // doc.text("Cleaning Services", 55, 20);
-
+    const logoWidth = 50;
+    const logoHeight = 20;
+    const logoX = (pageWidth - logoWidth) / 2; // center horizontally
+    doc.addImage(img, "PNG", logoX, 10, logoWidth, logoHeight);
     
+    // Text below logo (centered)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("Cleaning Services", pageWidth / 2, 38, { align: "center" });
+    
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("Professional Residential & Deep Cleaning Services", pageWidth / 2, 44, { align: "center" });
+    doc.text("Email: lungelwasgelem@gmail.com | Phone: +27 71 150 5808", pageWidth / 2, 49, { align: "center" });
+
+   
 
     // Add line separator
     doc.setDrawColor(96, 28, 20);
     doc.line(10, 50, 200, 50);
 
     // Invoice title
+    
+
     doc.setFontSize(14);
     doc.text("Estimate Invoice Summary", 10, 60);
+    doc.text(`Date: ${currentDate}`, pageWidth - 10, 60, { align: "right" });
 
     // Get invoice content
     const text = document.getElementById("invoiceOutput").textContent;
@@ -455,15 +496,32 @@ doc.text("Email: lungelwasgelem@gmail.com | Phone: +27 71 150 5808", pageWidth /
     const pageHeight = doc.internal.pageSize.height;
     doc.setFontSize(9);
     doc.setTextColor(100);
+    doc.setFontSize(9);
+    doc.setTextColor(100);
     doc.text(
-      "Thank you for choosing our services!",
-      10,
-      pageHeight - 10
-    );
+  [
+    "Kindly send this estimate by WhatsApp to 071 150 5808.",
+    "",
+    "",
+    "Thank you for choosing our services!"
+  ],
+  10,
+  pageHeight - 15
+);
 
     // Save PDF
     doc.save("AnamCleaningInvoice.pdf");
+
+    const wave = "\uD83D\uDC4B";
+    const phoneNumber = "27711505808"; // in international format without +
+    const message = encodeURIComponent(
+      "Hello Lungi \nI have generated my cleaning estimate.\n\n" + text
+    );
+    const whatsappURL = `https://wa.me/${phoneNumber}?text=${message}`;
+    window.open(whatsappURL, "_blank");
   };
+
+
 }
 
 
@@ -472,20 +530,18 @@ doc.text("Email: lungelwasgelem@gmail.com | Phone: +27 71 150 5808", pageWidth /
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-   <script>
-    $(document).ready(function() {
-  $('#extras').select2({
-    placeholder: "Select extras",
-    allowClear: true,
-    width: '100%',
-    dropdownAutoWidth: true
-  }).on('change', function() {
-    updateInvoice();
-  });
-});
-
+  <script>
+      $(document).ready(function() {
+          $('#extras').select2({
+          placeholder: "Select extras",
+          allowClear: true,
+          width: '100%',
+          dropdownAutoWidth: true
+      }).on('change', function() {
+          updateInvoice();
+      });
+    });
   </script>
 
 </body>
 </html>
-
