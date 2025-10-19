@@ -300,11 +300,11 @@ select:disabled {
     <!-- Invoice Section -->
     
     <div class="invoice-section">      
-      <h2>Estimate: Invoice Preview</h2>
+      <h2>Invoice Preview</h2>
       <div id="invoiceOutput" class="invoice"></div>
       <br/>
       <div class="note-box">
-        Download the estimate and send it to us by WhatsApp or email. We will call you there after to discuss it and might need some more information from you.
+        Download and send it to us by WhatsApp or email. WhatsApp: 071 150 5808. Email: lungelwasgelem@gmail.com
       </div>
       <button onclick="downloadPDF()">Download Invoice</button>
     </div>
@@ -333,12 +333,16 @@ select:disabled {
       // --- Disable rules based on selected service ---
 
       if(service === "Event Cleaning"){
-          bathroomTypeSelect.disabled = true;
           extrasSelect.disabled = true;
+          //$('#extras').val('').trigger('change');
+          bathroomsInput.value = 0;
+          bedroomsInput.value=0;
+
+          bathroomTypeSelect.disabled = true;          
+
           bathroomsInput.disabled = true;
           bedroomsInput.disabled = true;
-          bathroomsInput.value = 0;
-          bedroomsInput.value=0; 
+          
       }
       else if(service === "Deep Cleaning" ||  service === "Move In/Out Cleaning") {
         extrasSelect.disabled = true;
@@ -379,17 +383,12 @@ select:disabled {
       if (service === "Standard Cleaning") subtotal += prices.standardCleaning;
       else if (service === "Deep Cleaning") subtotal += prices.deepCleaning;
       else if (service === "Move In/Out Cleaning") subtotal += prices.deepCleaning + 200; // small uplift
-      else if (service === "Event Cleaning") subtotal += 1500;
+      else if (service === "Event Cleaning") {subtotal += 1500;}
+      {}
 
-      // subtotal += bedrooms * prices.perBedroom;
       subtotal += bedrooms * (service === "Deep Cleaning" ? prices.perBedroomDeep : prices.perBedroom);
 
-      // if (service === "Deep Cleaning")
-      //   subtotal += bathrooms * prices.bathroomDeep;
-      // else
-      //   subtotal += bathrooms * prices.bathroomStandard;
       subtotal += bathrooms * (service === "Deep Cleaning" ? prices.bathroomDeep : prices.bathroomStandard);
-
 
       let extrasText = [];
         selectedExtras.forEach(extra => {
@@ -440,93 +439,181 @@ Time: ${time}
 
     async function downloadPDF() {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({
-    unit: "mm",
-    format: "a4"
-  });
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const currentDate = new Date().toISOString().split("T")[0]; // yyyy-mm-dd
 
-  // Load and insert logo (must be in same directory)
+  // --- Load and add logo (centered)
   const img = new Image();
   img.src = "logo.png";
 
-  img.onload = function() {
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const currentDate = new Date().toLocaleDateString();
-
-// Centered logo
+  img.onload = function () {
     const logoWidth = 50;
     const logoHeight = 20;
-    const logoX = (pageWidth - logoWidth) / 2; // center horizontally
+    const logoX = (pageWidth - logoWidth) / 2;
     doc.addImage(img, "PNG", logoX, 10, logoWidth, logoHeight);
-    
-    // Text below logo (centered)
+
+    // --- Header text ---
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
     doc.text("Cleaning Services", pageWidth / 2, 38, { align: "center" });
-    
+
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.text("Professional Residential & Deep Cleaning Services", pageWidth / 2, 44, { align: "center" });
     doc.text("Email: lungelwasgelem@gmail.com | Phone: +27 71 150 5808", pageWidth / 2, 49, { align: "center" });
 
-   
-
-    // Add line separator
+    // --- Separator line ---
     doc.setDrawColor(96, 28, 20);
-    doc.line(10, 50, 200, 50);
+    doc.line(10, 52, 200, 52);
 
-    // Invoice title
-    
+    // --- Invoice Header ---
+    const fname = document.getElementById("fname").value || "";
+    const lname = document.getElementById("lname").value || "";
+    const contact = document.getElementById("contact").value || "";
+    const email = document.getElementById("email").value || "";
+    const address = document.getElementById("address").value || "";
+    const service = document.getElementById("service").value || "";
+    const bedrooms = parseInt(document.getElementById("bedrooms").value) || 0;
+    const bathrooms = parseInt(document.getElementById("bathrooms").value) || 0;
+    const bathroomType = document.getElementById("bathroomType").value;
+    const date = document.getElementById("date").value;
+    const time = document.getElementById("time").value;
+    const extrasSelect = document.getElementById("extras");
+    const selectedExtras = Array.from(extrasSelect.selectedOptions).map(opt => opt.value);
 
+    const prices = {
+      standardCleaning: 450,
+      deepCleaning: 1200,
+      moveInOut: 1400,
+      eventCleaning: 1500,
+      perBedroom: 100,
+      bathroomStandard: 80,
+      bathroomDeep: 250,
+      extras: {
+        windows: 140,
+        ironing: 35,
+        laundry: 100,
+        carpet: 60,
+        fridge: 90,
+        oven: 30,
+        cabinet: 60,
+        moult_removal: 300,
+        dishes: 100
+      }
+    };
+
+    let subtotal = 0;
+
+    // --- Service cost ---
+    if (service === "Standard Cleaning") subtotal += prices.standardCleaning;
+    else if (service === "Deep Cleaning") subtotal += prices.deepCleaning;
+    else if (service === "Move In/Out Cleaning") subtotal += prices.moveInOut;
+    else if (service === "Event Cleaning") subtotal += prices.eventCleaning;
+
+    subtotal += bedrooms * prices.perBedroom;
+
+    if (service === "Deep Cleaning")
+      subtotal += bathrooms * prices.bathroomDeep;
+    else
+      subtotal += bathrooms * prices.bathroomStandard;
+
+    const extrasText = [];
+    selectedExtras.forEach(extra => {
+      const key = extra.toLowerCase();
+      const price = prices.extras[key] || 0;
+      extrasText.push([extra, "1", price.toFixed(2), price.toFixed(2)]);
+      subtotal += price;
+    });
+
+    const vat = subtotal * 0.15;
+    const total = subtotal + vat;
+
+    // --- Header Title ---
     doc.setFontSize(14);
-    doc.text("Estimate Invoice Summary", 10, 60);
-    doc.text(`Date: ${currentDate}`, pageWidth - 10, 60, { align: "right" });
+    doc.setFont("helvetica", "bold");
+    doc.text("Invoice Summary", 10, 60);
+    doc.text(`Invoice Date: ${currentDate}`, pageWidth - 10, 60, { align: "right" });
 
-    // Get invoice content
-    const text = document.getElementById("invoiceOutput").textContent;
+    // --- Bill To section ---
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Bill To:", 10, 70);
+    doc.text(`${fname} ${lname}`, 10, 76);
+    doc.text(`Contact: ${contact}`, 10, 82);
+    doc.text(`Email: ${email}`, 10, 88);
+    doc.text(`Address: ${address}`, 10, 94);
 
-    // Wrap text and add after title
-    const lineHeight = 6;
-    const marginLeft = 10;
-    const marginTop = 70;
-    const lines = doc.splitTextToSize(text, 190);
-    doc.text(lines, marginLeft, marginTop, { maxWidth: 190, lineHeightFactor: 1.5 });
+    // --- Prepare items for the table ---
+    const items = [];
+    if (service) items.push(["Service Type", "1", "-", service]);
+    if (bedrooms > 0) items.push(["Bedrooms", bedrooms, prices.perBedroom.toFixed(2), (bedrooms * prices.perBedroom).toFixed(2)]);
+    if (bathrooms > 0) {
+      const bathRate = service === "Deep Cleaning" ? prices.bathroomDeep : prices.bathroomStandard;
+      items.push(["Bathrooms", bathrooms, bathRate.toFixed(2), (bathrooms * bathRate).toFixed(2)]);
+    }
+    if (extrasText.length > 0) extrasText.forEach(extra => items.push(extra));
 
-    // Add footer
+    // --- Add Table ---
+    doc.autoTable({
+      startY: 105,
+      head: [["Description", "Qty", "Rate (R)", "Amount (R)"]],
+      body: items,
+      theme: "grid",
+      styles: { halign: "left", fontSize: 10 },
+      headStyles: { fillColor: [96, 28, 20], textColor: 255 },
+      columnStyles: {
+        0: { cellWidth: 80 },
+        1: { halign: "center", cellWidth: 20 },
+        2: { halign: "right", cellWidth: 25 },
+        3: { halign: "right", cellWidth: 30 }
+      }
+    });
+
+    // --- Totals ---
+    let finalY = doc.lastAutoTable.finalY + 10;
+    doc.setFont("helvetica", "bold");
+    doc.text(`Subtotal: R${subtotal.toFixed(2)}`, 140, finalY);
+    doc.text(`VAT (15%): R${vat.toFixed(2)}`, 140, finalY + 6);
+    doc.text(`Total (Incl. VAT): R${total.toFixed(2)}`, 140, finalY + 12);
+
+    // --- Terms & Conditions ---
+    finalY += 25;
+    doc.setFont("helvetica", "bold");
+    doc.text("Terms & Conditions", 10, finalY);
+    doc.setFont("helvetica", "normal");
+    doc.text("50% payment is to be paid 36 hours prior to your booking day.", 10, finalY + 6);
+    doc.text("Please make payments to the following:", 10, finalY + 12);
+    doc.text("Bank: Capitec Bank", 10, finalY + 18);
+    doc.text("Account Name: Lungelwa Mothiba", 10, finalY + 24);
+    doc.text("Account Number: 12345678", 10, finalY + 30);
+
+    // --- Footer ---
     const pageHeight = doc.internal.pageSize.height;
     doc.setFontSize(9);
     doc.setTextColor(100);
-    doc.setFontSize(9);
-    doc.setTextColor(100);
-    doc.text(
-  [
-    "Kindly send this estimate by WhatsApp to 071 150 5808.",
-    "",
-    "",
-    "Thank you for choosing our services!"
-  ],
-  10,
-  pageHeight - 15
-);
+    doc.text([
+      "Kindly send this invoice by WhatsApp to 071 150 5808.",
+      "",
+      "Thank you for choosing our services!"
+    ], 10, pageHeight - 15);
 
-    // Save PDF
+    // --- Save PDF ---
     doc.save("AnamCleaningInvoice.pdf");
 
-    const wave = "\uD83D\uDC4B";
-    const phoneNumber = "27711505808"; // in international format without +
-    const message = encodeURIComponent(
-      "Hello Lungi \nI have generated my cleaning estimate.\n\n" + text
-    );
-    const whatsappURL = `https://wa.me/${phoneNumber}?text=${message}`;
-    window.open(whatsappURL, "_blank");
+    // --- Send to WhatsApp ---
+    // const phoneNumber = "27711505808"; // no "+" sign
+    // const message = encodeURIComponent(
+    //   "Hello Lungi,\nI have generated my cleaning invoice. Please find it attached."
+    // );
+    // const whatsappURL = `https://wa.me/${phoneNumber}?text=${message}`;
+    // window.open(whatsappURL, "_blank");
   };
-
-
 }
-
-
-    
+  
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
