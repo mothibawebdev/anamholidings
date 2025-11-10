@@ -539,10 +539,12 @@ Time: ${time}
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.text("Bill To:", 10, 70);
-    doc.text(`${fname} ${lname}`, 10, 76);
+    doc.text(`Full Name: ${fname} ${lname}`, 10, 76);
     doc.text(`Contact: ${contact}`, 10, 82);
     doc.text(`Email: ${email}`, 10, 88);
     doc.text(`Address: ${address}`, 10, 94);
+    doc.text(`Date: ${date}`,10,100);
+    doc.text(`Time: ${time}`, 10,106);
 
     // --- Prepare items for the table ---
     const items = [];
@@ -556,7 +558,7 @@ Time: ${time}
 
     // --- Add Table ---
     doc.autoTable({
-      startY: 105,
+      startY: 112,
       head: [["Description", "Qty", "Rate (R)", "Amount (R)"]],
       body: items,
       theme: "grid",
@@ -632,4 +634,3 @@ Time: ${time}
 
 </body>
 </html>
-
