@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Anam Holdings: Cleaning Services | Booking & Invoice</title>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <style>
     body {
   font-family: Arial, sans-serif;
@@ -287,7 +287,7 @@ select:disabled {
       <div class="form-row">
         <div class="form-group half">
           <label>Date</label>
-          <input type="date" id="date" required onchange="updateInvoice()">
+          <input type="date" id="date" required onchange="updateInvoice()" readonly style="padding:8px; width:220px;" placeholder="Select weekend only">
         </div>
         <div class="form-group half">
           <label>Time</label>
@@ -539,7 +539,7 @@ Time: ${time}
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.text("Bill To:", 10, 70);
-    doc.text(`Full Name: ${fname} ${lname}`, 10, 76);
+    doc.text(`Full Name:${fname} ${lname}`, 10, 76);
     doc.text(`Contact: ${contact}`, 10, 82);
     doc.text(`Email: ${email}`, 10, 88);
     doc.text(`Address: ${address}`, 10, 94);
@@ -631,6 +631,23 @@ Time: ${time}
       });
     });
   </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+    // Disable Monday (1) through Friday (5). 0 = Sunday, 6 = Saturday.
+    flatpickr("#date", {
+      dateFormat: "Y-m-d",
+      // disable function returns true for dates to disable
+      disable: [
+        function(date) {
+          const day = date.getDay();
+          return day >= 1 && day <= 5; // disable Mon..Fri
+        }
+      ],
+      // optional: show which days are disabled on hover
+      onReady: function(selectedDates, dateStr, instance) {
+        instance.calendarContainer.classList.add('fp-weekdays-disabled');
+      }
+    });
+  </script>
 </body>
 </html>
